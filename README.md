@@ -303,7 +303,7 @@ Generated Python cache files, virtual environments, local databases, and large g
 
 ```bash
 git clone https://github.com/simmaraju216/smartbank-analytics.git
-cd YottaFlex-Banking-Analytics
+cd smartbank-analytics
 ```
 
 ### Step 2: Create a Virtual Environment
