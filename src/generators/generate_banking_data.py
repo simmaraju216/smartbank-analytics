@@ -3,6 +3,8 @@ import os
 import random
 import argparse
 
+from datetime import timedelta, timezone
+
 import pandas as pd
 import numpy as np
 
@@ -226,6 +228,21 @@ def generate_banking_data(
             else None
         )
 
+        # Actual transaction event time (UTC).
+        event_timestamp = fake.date_time_between(
+            start_date="-365d",
+            end_date="now"
+        ).replace(tzinfo=timezone.utc)
+
+        # Simulate delivery delay between 0 and 72 hours.
+        arrival_delay_hours = random.randint(0, 72)
+
+        # Simulated ingestion/arrival time.
+        ingestion_timestamp = (
+            event_timestamp
+            + timedelta(hours=arrival_delay_hours)
+        )
+
         transactions.append({
 
             "transaction_id": f"TXN{i:010d}",
@@ -246,17 +263,30 @@ def generate_banking_data(
                 TRANSACTION_STATUSES
             ),
 
-            "transaction_timestamp": fake.date_time_between(
-                start_date="-365d",
-                end_date="now"
-            ).isoformat()
+            "transaction_timestamp": event_timestamp.isoformat(),
+
+            "ingested_at": ingestion_timestamp.isoformat()
 
         })
 
     transactions_df = pd.DataFrame(transactions)
 
+    # Sort by arrival time.
+    # Event timestamps can still appear out of order.
+    transactions_df = (
+        transactions_df
+        .sort_values("ingested_at", kind="stable")
+        .reset_index(drop=True)
+    )
+
     print(
         f"Transactions generated: {len(transactions_df)}"
+    )
+
+    print(
+        "Arrival timestamp range:",
+        f"{transactions_df['ingested_at'].min()} to "
+        f"{transactions_df['ingested_at'].max()}"
     )
 
     # --------------------------------------------------

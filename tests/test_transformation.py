@@ -1,3 +1,4 @@
+
 import pandas as pd
 
 from src.transformation.transform_data import (
@@ -23,6 +24,10 @@ def create_transactions():
         ]
     })
 
+
+# ==================================================
+# BASIC TRANSACTION TRANSFORMATION TESTS
+# ==================================================
 
 def test_transaction_date_columns():
     df = create_transactions()
@@ -74,6 +79,10 @@ def test_empty_transactions():
     assert result.empty
 
 
+# ==================================================
+# CUSTOMER TRANSFORMATION TEST
+# ==================================================
+
 def test_customer_standardization():
     df = pd.DataFrame({
         "customer_id": ["CUS001"],
@@ -87,3 +96,99 @@ def test_customer_standardization():
     assert result.loc[0, "email"] == "raju@gmail.com"
     assert result.loc[0, "city"] == "Srikakulam"
     assert result.loc[0, "state"] == "Andhra Pradesh"
+
+
+# ==================================================
+# LATE-ARRIVING TRANSACTION TESTS
+# ==================================================
+
+def test_late_arriving_transactions_are_identified():
+
+    df = pd.DataFrame({
+        "transaction_id": ["TXN001", "TXN002"],
+        "transaction_type": ["UPI", "UPI"],
+        "transaction_amount": [500, 600],
+        "transaction_timestamp": [
+            "2026-10-29T10:00:00Z",
+            "2026-10-30T10:00:00Z"
+        ],
+        "ingested_at": [
+            "2026-10-30T11:00:00Z",
+            "2026-10-30T11:00:00Z"
+        ]
+    })
+
+    result = transform_transactions(df)
+
+    assert result["is_late_arrival"].tolist() == [
+        True, False
+    ]
+
+    assert result["arrival_delay_hours"].tolist() == [
+        25.0, 1.0
+    ]
+
+
+# ==================================================
+# OUT-OF-ORDER TRANSACTION TEST
+# ==================================================
+
+def test_out_of_order_transactions_are_identified():
+
+    df = pd.DataFrame({
+        "transaction_id": ["TXN001", "TXN002", "TXN003"],
+        "transaction_type": ["UPI", "UPI", "UPI"],
+        "transaction_amount": [500, 600, 700],
+        "transaction_timestamp": [
+            "2026-10-15T10:00:00Z",
+            "2026-10-10T10:00:00Z",
+            "2026-10-12T10:00:00Z"
+        ],
+        "ingested_at": [
+            "2026-10-15T11:00:00Z",
+            "2026-10-15T11:00:00Z",
+            "2026-10-15T11:00:00Z"
+        ]
+    })
+
+    result = transform_transactions(df)
+
+    assert result["is_out_of_order"].tolist() == [
+        False, True, True
+    ]
+
+    # Original input order must be preserved.
+    assert result["transaction_id"].tolist() == [
+        "TXN001", "TXN002", "TXN003"
+    ]
+
+
+# ==================================================
+# RECORD PRESERVATION TEST
+# ==================================================
+
+def test_late_and_out_of_order_transactions_are_not_rejected():
+
+    df = pd.DataFrame({
+        "transaction_id": ["TXN001", "TXN002"],
+        "transaction_type": ["UPI", "UPI"],
+        "transaction_amount": [500, 600],
+        "transaction_timestamp": [
+            "2026-10-15T10:00:00Z",
+            "2026-10-10T10:00:00Z"
+        ],
+        "ingested_at": [
+            "2026-10-20T10:00:00Z",
+            "2026-10-20T10:00:00Z"
+        ]
+    })
+
+    result = transform_transactions(df)
+
+    assert len(result) == 2
+
+    assert result["is_late_arrival"].all()
+
+    assert result["is_out_of_order"].tolist() == [
+        False, True
+    ]

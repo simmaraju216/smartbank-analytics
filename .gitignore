@@ -44,3 +44,6 @@ data/temp/
 Thumbs.db
 
 # Keep reports, sample data, SQL, source code and tests in GitHub.
+data/arrival_test/
+
+reports/performance/previous_runs/

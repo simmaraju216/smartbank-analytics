@@ -8,12 +8,26 @@ def transform_transactions(df):
     analytics-ready records.
 
     Timestamp standard:
-        All transaction timestamps are stored in UTC.
+        Transaction and ingestion timestamps are stored in UTC.
+
+    Late arrival:
+        A transaction received more than 24 hours after
+        its event timestamp.
+
+    Out of order:
+        An event timestamp earlier than the maximum
+        event timestamp in preceding input rows.
+
+    Original row order is preserved.
+    Late and out-of-order transactions are not rejected.
 
     Derived columns:
         transaction_date
         transaction_month
         transaction_year
+        arrival_delay_hours
+        is_late_arrival
+        is_out_of_order
         debit_amount
         credit_amount
     """
@@ -44,7 +58,7 @@ def transform_transactions(df):
     )
 
     # --------------------------------------------------
-    # 3. CONVERT TIMESTAMP TO UTC
+    # 3. CONVERT TRANSACTION TIMESTAMP TO UTC
     # --------------------------------------------------
 
     transformed_df["transaction_timestamp"] = pd.to_datetime(
@@ -53,23 +67,58 @@ def transform_transactions(df):
         utc=True
     )
 
-    # --------------------------------------------------
-    # 4. CREATE DATE-RELATED COLUMNS USING UTC
-    # --------------------------------------------------
-
     timestamp = transformed_df["transaction_timestamp"]
 
-    # Extract the calendar date in UTC.
+    # --------------------------------------------------
+    # 4. CREATE DATE-RELATED COLUMNS
+    # --------------------------------------------------
+
     transformed_df["transaction_date"] = timestamp.dt.date
 
-    # Extract month in UTC.
     transformed_df["transaction_month"] = timestamp.dt.month
 
-    # Extract year in UTC.
     transformed_df["transaction_year"] = timestamp.dt.year
 
     # --------------------------------------------------
-    # 5. CREATE DEBIT AMOUNT
+    # 5. DETECT LATE-ARRIVING TRANSACTIONS
+    # --------------------------------------------------
+
+    if "ingested_at" in transformed_df.columns:
+
+        transformed_df["ingested_at"] = pd.to_datetime(
+            transformed_df["ingested_at"],
+            errors="coerce",
+            utc=True
+        )
+
+        transformed_df["arrival_delay_hours"] = (
+            transformed_df["ingested_at"] - timestamp
+        ).dt.total_seconds() / 3600
+
+        transformed_df["is_late_arrival"] = (
+            transformed_df["arrival_delay_hours"] > 24
+        ).fillna(False).astype(bool)
+
+    else:
+
+        transformed_df["arrival_delay_hours"] = float("nan")
+
+        transformed_df["is_late_arrival"] = False
+
+    # --------------------------------------------------
+    # 6. DETECT OUT-OF-ORDER TRANSACTIONS
+    # --------------------------------------------------
+
+    previous_max_timestamp = (
+        timestamp.cummax().shift(1)
+    )
+
+    transformed_df["is_out_of_order"] = (
+        timestamp < previous_max_timestamp
+    ).fillna(False).astype(bool)
+
+    # --------------------------------------------------
+    # 7. CREATE DEBIT AMOUNT
     # --------------------------------------------------
 
     debit_types = [
@@ -89,7 +138,7 @@ def transform_transactions(df):
     )
 
     # --------------------------------------------------
-    # 6. CREATE CREDIT AMOUNT
+    # 8. CREATE CREDIT AMOUNT
     # --------------------------------------------------
 
     credit_types = [

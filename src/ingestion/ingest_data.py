@@ -37,8 +37,9 @@ def ingest_data(input_dir=None, tracker=None):
     2. Check that all required CSV files exist.
     3. Read CSV files into Pandas DataFrames.
     4. Attach source_file, run_id and ingested_at.
-    5. Record input row counts.
-    6. Return datasets and the shared run tracker.
+    5. Preserve existing transaction arrival timestamps.
+    6. Record input row counts.
+    7. Return datasets and the shared run tracker.
 
     If a tracker is supplied by the main pipeline,
     reuse it so the complete pipeline has one run ID.
@@ -107,9 +108,14 @@ def ingest_data(input_dir=None, tracker=None):
 
             df["source_file"] = file_name
             df["run_id"] = tracker.run_id
-            df["ingested_at"] = datetime.now(
-                timezone.utc
-            ).isoformat()
+
+            # Preserve simulated transaction arrival timestamps.
+            # For datasets without an arrival timestamp,
+            # use the current UTC batch ingestion time.
+            if "ingested_at" not in df.columns:
+                df["ingested_at"] = datetime.now(
+                    timezone.utc
+                ).isoformat()
 
             # --------------------------------------
             # 4. STORE DATASET

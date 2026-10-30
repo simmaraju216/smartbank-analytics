@@ -55,6 +55,9 @@ The objective is to establish a measurable performance baseline, implement SQL o
 - Foreign-key validation
 - Invalid-record quarantine
 - Data transformation
+- Synthetic late-arrival simulation (0–72-hour delivery delay)
+- Late-arrival detection using a 24-hour threshold
+- Batch-level out-of-order transaction detection
 - Parquet storage
 - DuckDB analytical database
 - Five baseline SQL workloads
@@ -116,6 +119,26 @@ The project uses synthetic banking data.
 | **Total** | **612,610** |
 
 All records are synthetic and do not represent real banking customers or transactions.
+
+### Late-Arriving and Out-of-Order Transactions
+
+The transaction generator simulates delivery delays by assigning each transaction an `ingested_at` timestamp between 0 and 72 hours after its `transaction_timestamp`. Transactions are ordered by ingestion time while retaining their original event timestamps.
+
+The transformation pipeline derives:
+
+- `arrival_delay_hours`: elapsed hours between event time and ingestion time.
+- `is_late_arrival`: true when the simulated arrival delay exceeds 24 hours.
+- `is_out_of_order`: true when a transaction's event timestamp is earlier than the maximum event timestamp previously observed in the current batch.
+
+In the latest recorded 500,000-transaction dataset:
+
+| Metric | Records | Percentage |
+|---|---:|---:|
+| Late arrivals (over 24 hours) | 328,726 | 65.75% |
+| Out-of-order transactions | 489,367 | 97.87% |
+| Missing arrival delays | 0 | 0% |
+
+These percentages reflect the project's synthetic timestamp-generation strategy. They are not estimates of real banking arrival patterns. Out-of-order detection is batch-local; cross-run watermarks and persistent streaming state are not implemented.
 
 ### Dataset and Workload Assumptions
 
@@ -364,7 +387,7 @@ Generated CSV files are stored under:
 data/raw/
 ```
 
-The configured random seed supports repeatable pseudo-random data generation. Generated timestamps may vary depending on the generation date.
+The configured random seed supports repeatable pseudo-random data generation. Generated timestamps may vary depending on the generation date. Transaction ingestion timestamps simulate delivery delays of 0–72 hours after event time; generated transactions are ordered by ingestion time to make batch-level out-of-order detection testable.
 
 ## 11. Run the Data Pipeline
 
@@ -414,18 +437,16 @@ python -c "from src.main import run_pipeline; result = run_pipeline(input_dir='s
 | Output records | 612,610 |
 | Rejected records | 0 |
 | Errors | 0 |
-| Execution time | 6.943 seconds |
+| Execution time | Not recorded in this summary |
 | Status | SUCCESS |
 
 Run ID:
 
 ```text
-RUN_20261030_143804_73745c37
+RUN_20261030_191001_b4579e24
 ```
 
-The corresponding run report is stored in the local `logs/` directory.
-
-This is a recorded full-dataset execution; it is separate from the latest sample pipeline run and should be treated as historical execution evidence.
+The corresponding run report is stored in the local `logs/` directory. This run processed 612,610 input records, published 612,610 output records, and reported zero rejected records.
 
 ## 12. Load Data into DuckDB
 
@@ -558,23 +579,23 @@ python -m src.optimization.consolidate_performance_reports
 
 | Query | Baseline (sec) | Optimized (sec) | Measured Improvement |
 |---|---:|---:|---:|
-| Q1 - Monthly transactions | 0.036705 | 0.011514 | 68.63% |
-| Q2 - Customer analysis | 0.092689 | 0.062242 | 32.85% |
-| Q3 - Branch performance | 0.046677 | 0.030332 | 35.02% |
-| Q4 - Merchant analysis | 0.015918 | 0.011917 | 25.14% |
-| Q5 - Daily debit/credit | 0.020430 | 0.017314 | 15.25% |
+| Q1 - Monthly transactions | 0.028922 | 0.015460 | 46.55% |
+| Q2 - Customer analysis | 0.089561 | 0.069140 | 22.80% |
+| Q3 - Branch performance | 0.044057 | 0.030550 | 30.66% |
+| Q4 - Merchant analysis | 0.014695 | 0.012229 | 16.78% |
+| Q5 - Daily debit/credit | 0.017664 | 0.015741 | 10.89% |
 
-**Interpretation:** Q1-Q4 use identifiable SQL optimization techniques. Q5 recorded a lower median execution time, but its final SQL uses the same date conversion as the baseline. Its timing difference is an observed benchmark result, not a proven SQL optimization.
+**Interpretation:** Q1-Q4 use identifiable SQL optimization techniques. Q5 recorded a 10.89% lower median execution time, but its final SQL uses the same date conversion as the baseline. Its timing difference is an observed benchmark result, not a proven SQL optimization.
 
-These are local experimental measurements based on three repetitions, not production performance guarantees. Caching and background system activity may affect timings.
+All five queries recorded lower median execution times in this benchmark run. These are local experimental measurements based on three repetitions, not production performance guarantees. Caching and background system activity may affect timings.
 
 ### Key Findings
 
-- Q1 recorded the highest measured improvement at 68.63%.
-- Q2 improved by 32.85%.
-- Q3 improved by 35.02%.
-- Q4 improved by 25.14%.
-- Q5 recorded a 15.25% lower median time without a distinct SQL rewrite.
+- Q1 recorded the highest measured improvement at 46.55%.
+- Q2 improved by 22.80%.
+- Q3 improved by 30.66%.
+- Q4 improved by 16.78%.
+- Q5 recorded a 10.89% lower median time without a distinct SQL rewrite.
 
 ### Performance Report Locations
 
@@ -589,6 +610,25 @@ reports/performance/
     |-- Q1-Q5 baseline execution plans
     |-- Q1-Q5 optimized execution plans
 ```
+
+### Validation Performance Benchmark
+
+Run the validation benchmark:
+
+```bash
+python -m src.optimization.benchmark_validation
+```
+
+The benchmark measures transaction and fraud-alert validation throughput and saves its results to `reports/performance/validation_benchmark.json`.
+
+Latest recorded results:
+
+| Dataset | Total Records | Valid | Rejected | Execution Time (sec) | Records/sec |
+|---|---:|---:|---:|---:|---:|
+| Transactions | 500,000 | 500,000 | 0 | 1.1241 | 444,813.82 |
+| Fraud alerts | 25,000 | 25,000 | 0 | 3.4803 | 7,183.19 |
+
+These are local measurements from the development environment. The benchmark validates these two datasets only; it should not be interpreted as a seven-table validation performance result.
 
 ## 16. Run Automated Tests
 
@@ -629,12 +669,12 @@ The complete automated test suite was executed successfully.
 | Metric | Result |
 |---|---:|
 | Python version | 3.12.0 |
-| Total tests | 83 |
-| Passed | 83 |
+| Total tests | 87 |
+| Passed | 87 |
 | Failed | 0 |
-| Execution time | 3.09 seconds |
+| Execution time | 3.40 seconds |
 
-**All 83 automated tests passed in 3.09 seconds.**
+**All 87 automated tests passed in 3.40 seconds.**
 
 Test execution evidence is available in:
 
@@ -697,7 +737,8 @@ Current limitations and possible improvements include:
 - Expand retry and interrupted-run recovery testing.
 - Improve pipeline observability.
 - Evaluate additional query optimization techniques.
-- Expand negative test scenarios for late-arriving data and other edge cases where not yet covered.
+- Extend late-arrival and out-of-order handling across multiple pipeline runs.
+- Implement persistent event-time watermarks or streaming state if cross-run ordering detection is required.
 
 These limitations are documented to distinguish implemented functionality from future improvements.
 
@@ -707,7 +748,7 @@ SmartBank Analytics demonstrates a reproducible banking data engineering and ana
 
 The project combines synthetic data generation, data validation, transformation, Parquet storage, DuckDB analytics, SQL correctness testing, and performance benchmarking.
 
-All five optimized query outputs passed correctness validation, and all five recorded lower median execution times in the current local benchmark. Q5's timing difference is not claimed as a proven SQL optimization.
+All five optimized query outputs passed correctness validation. In the latest local benchmark, all five recorded lower median execution times; Q5's timing difference is not claimed as a proven SQL optimization. The validation benchmark measured transaction and fraud-alert validation separately, and the pipeline includes synthetic late-arrival and batch-level out-of-order detection.
 
 The project emphasizes measurable performance analysis, analytical correctness, data quality, and traceable pipeline execution.
 
