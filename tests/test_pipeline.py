@@ -536,3 +536,115 @@ def test_pipeline_rejection_preserves_fraud_alert_metadata(tmp_path):
         "2026-10-30T10:00:00+00:00"
     )
     assert "rejection_reason" in rejected.columns
+# ==================================================
+# TEST 14: PIPELINE RETRY AFTER FAILURE
+# ==================================================
+
+def test_pipeline_succeeds_after_previous_failure(
+    tmp_path,
+    monkeypatch
+):
+    import pandas as pd
+
+    datasets = create_sample_datasets()
+
+    output_dir = tmp_path / "data"
+
+    # ----------------------------------------------
+    # FIRST ATTEMPT: SIMULATE OUTPUT WRITE FAILURE
+    # ----------------------------------------------
+
+    failed_tracker = create_tracker(tmp_path)
+
+    def simulate_write_failure(self, *args, **kwargs):
+        raise OSError("Simulated temporary write failure")
+
+    with monkeypatch.context() as patch:
+
+        patch.setattr(
+            pd.DataFrame,
+            "to_parquet",
+            simulate_write_failure
+        )
+
+        with pytest.raises(
+            OSError,
+            match="Simulated temporary write failure"
+        ):
+            run_pipeline(
+                datasets=datasets,
+                tracker=failed_tracker,
+                output_dir=str(output_dir)
+            )
+
+    # Verify first attempt failed.
+    assert failed_tracker.metrics["status"] == "FAILED"
+
+    assert any(
+        "Simulated temporary write failure" in error
+        for error in failed_tracker.metrics["errors"]
+    )
+
+    failed_output = (
+        output_dir / failed_tracker.run_id
+    )
+
+    assert not failed_output.exists()
+
+    # ----------------------------------------------
+    # SECOND ATTEMPT: RETRY WITH FRESH RUN TRACKER
+    # ----------------------------------------------
+
+    retry_tracker = create_tracker(tmp_path)
+
+    result = run_pipeline(
+        datasets=datasets,
+        tracker=retry_tracker,
+        output_dir=str(output_dir)
+    )
+
+    # ----------------------------------------------
+    # VERIFY SUCCESSFUL RETRY
+    # ----------------------------------------------
+
+    assert result["status"] == "SUCCESS"
+
+    assert retry_tracker.metrics["status"] == "SUCCESS"
+
+    assert retry_tracker.run_id != failed_tracker.run_id
+
+    successful_output = output_dir / retry_tracker.run_id
+
+    assert successful_output.exists()
+
+    # Verify processed output.
+    assert (
+        successful_output / "processed" / "transactions.parquet"
+    ).exists()
+
+    # Verify reconciliation report.
+    reconciliation_file = (
+        successful_output / "reconciliation_report.csv"
+    )
+
+    assert reconciliation_file.exists()
+
+    report = pd.read_csv(reconciliation_file)
+
+    assert len(report) == 7
+
+    assert (report["status"] == "PASS").all()
+
+    assert (
+        report["input_records"]
+        == report["valid_records"] + report["rejected_records"]
+    ).all()
+
+    # Verify failed run did not leave temporary directories.
+    temporary_directories = list(
+        output_dir.glob(
+            f".{failed_tracker.run_id}_tmp_*"
+        )
+    )
+
+    assert temporary_directories == []
