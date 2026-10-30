@@ -302,7 +302,7 @@ Generated Python cache files, virtual environments, local databases, and large g
 ### Step 1: Clone the Repository
 
 ```bash
-git clone <your-github-repository-url>
+git clone https://github.com/simmaraju216/smartbank-analytics.git
 cd YottaFlex-Banking-Analytics
 ```
 
