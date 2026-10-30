@@ -1,4 +1,3 @@
-
 import os
 import shutil
 import uuid
@@ -125,7 +124,8 @@ def combine_rejections(*frames):
 def save_pipeline_outputs(
     processed,
     rejected,
-    output_dir
+    output_dir,
+    reconciliation_report=None
 ):
     """
     Save pipeline outputs into a temporary directory.
@@ -152,6 +152,27 @@ def save_pipeline_outputs(
 
         processed_dir.mkdir(parents=True)
         rejected_dir.mkdir(parents=True)
+
+        # ----------------------------------------------
+        # Save reconciliation report
+        # ----------------------------------------------
+
+        if reconciliation_report is not None:
+
+            report_path = (
+                temp_dir / "reconciliation_report.csv"
+            )
+
+            reconciliation_report.to_csv(
+                report_path,
+                index=False
+            )
+
+            if not report_path.is_file():
+
+                raise FileNotFoundError(
+                    f"Missing reconciliation report: {report_path}"
+                )
 
         # ----------------------------------------------
         # Save processed datasets
@@ -242,6 +263,10 @@ def save_pipeline_outputs(
         print("\nOUTPUT FILES SAVED")
         print(f"Processed: {output_path / 'processed'}")
         print(f"Rejected:  {output_path / 'rejected'}")
+        print(
+            f"Reconciliation: "
+            f"{output_path / 'reconciliation_report.csv'}"
+        )
 
     except Exception:
 
@@ -490,28 +515,90 @@ def run_pipeline(
         # 9. RECORD COUNT RECONCILIATION
         # --------------------------------------------------
 
-        print("\nSTEP 9: RECORD RECONCILIATION")
+        print("\nSTEP 9: RECORD COUNT RECONCILIATION")
 
-        total_input = sum(
-            len(df) for df in datasets.values()
+        reconciliation_rows = []
+
+        for dataset_name, input_df in datasets.items():
+
+            input_count = len(input_df)
+            valid_count = len(processed[dataset_name])
+            rejected_count = len(rejected[dataset_name])
+
+            difference = input_count - (
+                valid_count + rejected_count
+            )
+
+            status = (
+                "PASS" if difference == 0 else "FAIL"
+            )
+
+            reconciliation_rows.append({
+                "dataset": dataset_name,
+                "input_records": input_count,
+                "valid_records": valid_count,
+                "rejected_records": rejected_count,
+                "difference": difference,
+                "status": status
+            })
+
+            print(
+                f"{dataset_name}: "
+                f"input={input_count:,}, "
+                f"valid={valid_count:,}, "
+                f"rejected={rejected_count:,}, "
+                f"difference={difference:,} "
+                f"[{status}]"
+            )
+
+        reconciliation_report = pd.DataFrame(
+            reconciliation_rows,
+            columns=[
+                "dataset",
+                "input_records",
+                "valid_records",
+                "rejected_records",
+                "difference",
+                "status"
+            ]
         )
 
-        total_output = sum(
-            len(df) for df in processed.values()
+        total_input = int(
+            reconciliation_report["input_records"].sum()
         )
 
-        total_rejected = sum(
-            len(df) for df in rejected.values()
+        total_output = int(
+            reconciliation_report["valid_records"].sum()
         )
+
+        total_rejected = int(
+            reconciliation_report["rejected_records"].sum()
+        )
+
+        print("\nOVERALL RECONCILIATION")
 
         print(f"Input records:    {total_input:,}")
         print(f"Output records:   {total_output:,}")
         print(f"Rejected records: {total_rejected:,}")
 
+        if (
+            reconciliation_report["status"] != "PASS"
+        ).any():
+
+            failed_datasets = reconciliation_report.loc[
+                reconciliation_report["status"] != "PASS",
+                "dataset"
+            ].tolist()
+
+            raise ValueError(
+                "Record reconciliation failed for datasets: "
+                + ", ".join(failed_datasets)
+            )
+
         if total_input != total_output + total_rejected:
 
             raise ValueError(
-                "Record reconciliation failed: "
+                "Overall record reconciliation failed: "
                 "input does not equal output plus rejected"
             )
 
@@ -529,7 +616,8 @@ def run_pipeline(
         save_pipeline_outputs(
             processed,
             rejected,
-            run_output_dir
+            run_output_dir,
+            reconciliation_report=reconciliation_report
         )
 
         # --------------------------------------------------
@@ -549,6 +637,7 @@ def run_pipeline(
             "status": "SUCCESS",
             "processed": processed,
             "rejected": rejected,
+            "reconciliation_report": reconciliation_report,
             "metrics": tracker.metrics,
             "output_dir": run_output_dir
         }
