@@ -1,0 +1,22 @@
+{
+    "benchmark_name": "SmartBank Validation Benchmark",
+    "created_at": "2026-10-30T12:24:07.398815+00:00",
+    "results": [
+        {
+            "dataset": "transactions",
+            "total_records": 500000,
+            "valid_records": 500000,
+            "rejected_records": 0,
+            "execution_time_seconds": 0.7413,
+            "records_per_second": 674461.1
+        },
+        {
+            "dataset": "fraud_alerts",
+            "total_records": 25000,
+            "valid_records": 25000,
+            "rejected_records": 0,
+            "execution_time_seconds": 3.5063,
+            "records_per_second": 7129.96
+        }
+    ]
+}

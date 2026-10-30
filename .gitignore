@@ -1,0 +1,46 @@
+# Python virtual environments
+venv/
+.venv/
+
+# Python cache and test cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# Local databases
+*.duckdb
+*.db
+
+# Generated datasets and pipeline outputs
+data/raw/
+data/processed/
+data/rejected/
+data/synthetic/
+data/RUN_*/
+data/tmp/
+data/temp/
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE settings
+.idea/
+.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Keep reports, sample data, SQL, source code and tests in GitHub.

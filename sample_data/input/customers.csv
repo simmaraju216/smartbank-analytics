@@ -1,0 +1,101 @@
+customer_id,customer_name,email,city,state
+CUST000001,Aryan Maharaj,udantdewan@example.net,Bongaigaon,Assam
+CUST000002,Azad Balan,kamdarviraj@example.net,Kishanganj,Gujarat
+CUST000003,Thomas Sen,abeer26@example.com,Bhatpara,Gujarat
+CUST000004,Harsh Chanda,wchatterjee@example.com,Varanasi,Telangana
+CUST000005,Jeet Radhakrishnan,memonjanaki@example.net,Coimbatore,Arunachal Pradesh
+CUST000006,Bimala Buch,harrisonrai@example.com,Bharatpur,Goa
+CUST000007,Isha Kadakia,ekbal92@example.net,Ujjain,Manipur
+CUST000008,Anamika Kanda,daksh30@example.com,Agartala,Assam
+CUST000009,Divya Kala,prandhawa@example.com,Bilaspur,Chhattisgarh
+CUST000010,Adya Sangha,opathak@example.org,Mysore,Tripura
+CUST000011,Imaran Dua,pahalbhatt@example.com,Kavali,Manipur
+CUST000012,Advay Contractor,harini14@example.com,Malda,Andhra Pradesh
+CUST000013,Xiti Gokhale,misrayashica@example.net,Jamnagar,Kerala
+CUST000014,Aadi Naik,hbahl@example.com,Mathura,Arunachal Pradesh
+CUST000015,Farhan Chada,wbiswas@example.net,Warangal,Sikkim
+CUST000016,Noah Lanka,ikakar@example.net,Bijapur,Madhya Pradesh
+CUST000017,Raksha Varughese,pdara@example.org,Sonipat,Andhra Pradesh
+CUST000018,Thomas Amble,bhargavaveer@example.org,Bathinda,Assam
+CUST000019,Arya Sunder,kevinsolanki@example.org,Vellore,Gujarat
+CUST000020,Gunbir Sankar,pallavi67@example.net,Navi Mumbai,Arunachal Pradesh
+CUST000021,Harinakshi Chopra,rehaangupta@example.net,Kolhapur,Maharashtra
+CUST000022,Arya Shere,faqidsavant@example.net,Dhanbad,Rajasthan
+CUST000023,Girik Khalsa,niharikasunder@example.com,Rewa,Arunachal Pradesh
+CUST000024,Ladli Agate,ylanka@example.com,Bhusawal,Tamil Nadu
+CUST000025,Mohammed Gupta,teerth09@example.net,Satara,Arunachal Pradesh
+CUST000026,Vansha Thakkar,daksheshtrivedi@example.org,Coimbatore,Punjab
+CUST000027,Wahab Raval,koshybalveer@example.net,Gurgaon,Sikkim
+CUST000028,Advika Jayaraman,william46@example.org,Berhampore,Karnataka
+CUST000029,Aditya Shanker,borahtanay@example.net,Mira-Bhayandar,Kerala
+CUST000030,Yash Pingle,nakul78@example.net,Pudukkottai,Uttar Pradesh
+CUST000031,Chandani Chawla,aishanidalia@example.org,Darbhanga,Jharkhand
+CUST000032,Hemal Jani,yashasvi74@example.org,Bhusawal,Uttarakhand
+CUST000033,Chaitanya Aggarwal,kalpit42@example.net,Suryapet,Tamil Nadu
+CUST000034,Aditya Choudhury,dixitbalendra@example.com,Chinsurah,Chhattisgarh
+CUST000035,Darika Patla,parmarshivansh@example.net,Kota,Kerala
+CUST000036,Mohammed Khalsa,petersachar@example.org,Thoothukudi,Uttar Pradesh
+CUST000037,Yuvraj Loke,hritikraja@example.org,Korba,Gujarat
+CUST000038,Inaya Mody,udantbajwa@example.net,Silchar,Karnataka
+CUST000039,Ekaraj Mallick,yashodhara68@example.com,Bhiwandi,Himachal Pradesh
+CUST000040,Alka Barad,sarafhemani@example.net,Junagadh,Punjab
+CUST000041,Lekha Gupta,chaitanya60@example.net,Bharatpur,Maharashtra
+CUST000042,Ganga Murthy,mitalyashica@example.com,Khammam,Madhya Pradesh
+CUST000043,Joshua Handa,rraghavan@example.net,Tadepalligudem,Odisha
+CUST000044,Nidra Acharya,bhavini36@example.net,Kirari Suleman Nagar,Manipur
+CUST000045,Tanay Vaidya,qgara@example.org,Kottayam,Sikkim
+CUST000046,Girik Keer,umang32@example.org,Sambalpur,Meghalaya
+CUST000047,Tamanna Sachdeva,leenatalwar@example.com,Siliguri,Rajasthan
+CUST000048,Hredhaan Sandal,patrickvasa@example.com,Proddatur,Haryana
+CUST000049,Tanmayi Deol,jwali@example.net,Mango,Punjab
+CUST000050,Sanaya Dutt,qsengupta@example.org,Saharsa,Meghalaya
+CUST000051,Anvi Sarraf,mangalwahab@example.com,Imphal,Nagaland
+CUST000052,Lakshit Dora,leeladua@example.net,Rajkot,Maharashtra
+CUST000053,Ganga Shukla,nbhatia@example.com,Bhimavaram,Tamil Nadu
+CUST000054,Lajita Sood,pandeychanchal@example.com,Siwan,Telangana
+CUST000055,Vinaya Kanda,rajata70@example.com,Machilipatnam,Telangana
+CUST000056,Unni Datta,rameshavi@example.org,Bhavnagar,West Bengal
+CUST000057,Qabil Bedi,ladli53@example.com,Naihati,Tripura
+CUST000058,Arunima Sama,finn70@example.net,Etawah,Haryana
+CUST000059,Banjeet Balasubramanian,ryanbahri@example.net,Mathura,Chhattisgarh
+CUST000060,Ishwar Kamdar,xkunda@example.com,Medininagar,Punjab
+CUST000061,Nihal Mukhopadhyay,baldevika@example.net,Sikar,Tamil Nadu
+CUST000062,Faqid Kibe,mitrajai@example.net,Sri Ganganagar,Nagaland
+CUST000063,Kamala Biswas,advik67@example.org,Mirzapur,Rajasthan
+CUST000064,Michael Saran,anamikayohannan@example.com,Junagadh,Uttarakhand
+CUST000065,Ekantika Korpal,mallickshravya@example.org,Jehanabad,Punjab
+CUST000066,Gayathri Balakrishnan,lnair@example.com,Raichur,Uttar Pradesh
+CUST000067,Harini Mammen,advaith83@example.org,Vellore,Meghalaya
+CUST000068,Vamakshi Swaminathan,fbadal@example.com,Machilipatnam,Tamil Nadu
+CUST000069,Damini Pillay,wwali@example.com,Nagercoil,Tamil Nadu
+CUST000070,Anika Mohan,vihaan13@example.com,Jorhat,Tripura
+CUST000071,Rehaan Kalita,umalhotra@example.net,Salem,Uttarakhand
+CUST000072,Chaman Karan,praneel40@example.net,Panipat,Arunachal Pradesh
+CUST000073,Brinda Date,achauhan@example.net,Nandyal,Meghalaya
+CUST000074,Harini Gour,krishnanvanya@example.org,Rewa,Meghalaya
+CUST000075,Chatresh Doshi,dakshachada@example.org,Proddatur,Tripura
+CUST000076,Upkaar Virk,cseshadri@example.com,Farrukhabad,Odisha
+CUST000077,Hardik Johal,aishanibumb@example.org,Malegaon,Nagaland
+CUST000078,Naksh Agate,sseshadri@example.net,Jalna,Arunachal Pradesh
+CUST000079,Bhavya Mandal,rbobal@example.org,Giridih,Sikkim
+CUST000080,Pavani Contractor,manthanlata@example.org,Allahabad,Goa
+CUST000081,Bhavya Sarna,sidhudaksha@example.net,Darbhanga,Mizoram
+CUST000082,Raksha Buch,sankaranekantika@example.net,Indore,Assam
+CUST000083,Ansh Luthra,gillupma@example.net,Alwar,Goa
+CUST000084,Vyanjana Chand,apall@example.com,Vasai-Virar,West Bengal
+CUST000085,Forum Sabharwal,qmani@example.com,Malda,Assam
+CUST000086,Zayyan Naik,ravalyoshita@example.org,Haridwar,Arunachal Pradesh
+CUST000087,Zarna Pathak,wsathe@example.org,Shimoga,Nagaland
+CUST000088,Bhavna Sarma,bdara@example.net,Kozhikode,Jharkhand
+CUST000089,Nikita Chander,ishaanshenoy@example.org,Panchkula,Tamil Nadu
+CUST000090,Yashodhara Mahajan,esubramanian@example.org,Suryapet,Chhattisgarh
+CUST000091,Rayaan Trivedi,ekarajmajumdar@example.com,Guna,Himachal Pradesh
+CUST000092,Barkha Misra,cdixit@example.net,Hapur,Karnataka
+CUST000093,Tamanna Nagy,williamrajagopal@example.org,Varanasi,Karnataka
+CUST000094,Lakshmi Raju,warhibansal@example.org,Salem,West Bengal
+CUST000095,Harish Vora,uaurora@example.org,Bhatpara,Assam
+CUST000096,Alka Nigam,vbuch@example.net,Ratlam,Rajasthan
+CUST000097,Balendra Biswas,bhavnakaran@example.net,Raebareli,Bihar
+CUST000098,Sachi Ganesan,ayush05@example.org,Secunderabad,Kerala
+CUST000099,Madhav Konda,kgole@example.org,Phagwara,West Bengal
+CUST000100,Wridesh Tank,vincentshenoy@example.net,Jaunpur,Himachal Pradesh

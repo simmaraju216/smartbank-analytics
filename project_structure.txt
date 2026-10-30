@@ -1,0 +1,103 @@
+﻿# SmartBank Analytics - Project Structure
++---config
+|   |   __init__.py
+|   |   settings.py
++---data
++---docs
+|   |   ai_prompt_history.md
+|   |   architecture.md
+|   |   business_rules.md
+|   |   data_dictionary.md
+|   |   design_decisions.md
+|   |   query_optimization_analysis.md
++---reports
+|   +---data_quality
+|   +---performance
+|   |   |   baseline_results.csv
+|   |   |   consolidated_performance_report.csv
+|   |   |   optimization_summary.md
+|   |   |   optimized_results.csv
+|   |   |   Q1_monthly_transactions_optimized_plan.txt
+|   |   |   Q1_monthly_transactions_plan.txt
+|   |   |   Q2_customer_analysis_optimized_plan.txt
+|   |   |   Q2_customer_analysis_plan.txt
+|   |   |   Q3_branch_performance_optimized_plan.txt
+|   |   |   Q3_branch_performance_plan.txt
+|   |   |   Q4_merchant_analysis_optimized_plan.txt
+|   |   |   Q4_merchant_analysis_plan.txt
+|   |   |   Q5_daily_debit_credit_optimized_plan.txt
+|   |   |   Q5_daily_debit_credit_plan.txt
+|   |   |   validation_benchmark.json
+|   +---reconciliation
+|   |   pytest_output.log
+|   |   pytest_output.txt
++---sample_data
+|   +---input
+|   |   |   accounts.csv
+|   |   |   branches.csv
+|   |   |   cards.csv
+|   |   |   customers.csv
+|   |   |   fraud_alerts.csv
+|   |   |   merchants.csv
+|   |   |   transactions.csv
+|   |   README.md
++---sql
+|   +---baseline
+|   |   |   q1_monthly_transactions.sql
+|   |   |   q2_customer_analysis.sql
+|   |   |   q3_branch_performance.sql
+|   |   |   q4_merchant_analysis.sql
+|   |   |   q5_daily_debit_credit.sql
+|   +---optimized
+|   |   |   q1_monthly_transactions.sql
+|   |   |   q2_customer_analysis.sql
+|   |   |   q3_branch_performance.sql
+|   |   |   q4_merchant_analysis.sql
+|   |   |   q5_daily_debit_credit.sql
++---src
+|   +---database
+|   |   |   __init__.py
+|   |   |   duckdb_manager.py
+|   +---generators
+|   |   |   __init__.py
+|   |   |   generate_banking_data.py
+|   +---ingestion
+|   |   |   __init__.py
+|   |   |   ingest_data.py
+|   +---monitoring
+|   |   run_tracker.py
+|   |   |   __init__.py
+|   +---optimization
+|   |   |   __init__.py
+|   |   |   benchmark_optimized_sql.py
+|   |   |   benchmark_sql.py
+|   |   |   benchmark_validation.py
+|   |   |   compare_queries.py
+|   |   |   consolidate_performance_reports.py
+|   +---transformation
+|   |   |   __init__.py
+|   |   |   transform_data.py
+|   +---validation
+|   |   |   __init__.py
+|   |   |   business_validator.py
+|   |   |   duplicate_handler.py
+|   |   |   schema_validator.py
+|   |   __init__.py
+|   |   main.py
++---tests
+|   |   test_business_validator.py
+|   |   test_config.py
+|   |   test_duckdb_manager.py
+|   |   test_duplicate_handler.py
+|   |   test_idempotency.py
+|   |   test_pipeline.py
+|   |   test_run_tracker.py
+|   |   test_schema_validator.py
+|   |   test_transformation.py
+|   .env.example
+|   .gitignore
+|   project_structure.txt
+|   pytest.ini
+|   README.md
+|   requirements.txt
+
