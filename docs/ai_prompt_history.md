@@ -65,14 +65,15 @@ Used to identify the major project components, including synthetic data generati
 
 **Recovered prompts:**
 
-- "give base on problem statement"
-- "i have to work on which data"
-- "they mension on problem statement"
-- "so i have to choose any business relate data set"
-- "give best data"
-- "i have to choose"
-- "Banking / Financial Analytics"
-- "give best choice"
+Does the problem statement specify a particular dataset, or am I expected to choose one?
+
+If dataset selection is open, can I use any business-related dataset that aligns with the project requirements?
+
+What type of banking or financial dataset would be most suitable for this project?
+
+Please recommend the best dataset based on the problem statement, business relevance, data complexity, and technical requirements.
+
+Explain why you recommend this dataset and how it will help me demonstrate the required project outcomes.
 
 **Purpose:**
 
